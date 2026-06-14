@@ -4,6 +4,7 @@ const path = require('path');
 const axios = require('axios');
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
 const NGENIUS_BASE_URL = process.env.NGENIUS_BASE_URL || 'https://api-gateway.sandbox.ksa.ngenius-payments.com';
@@ -85,7 +86,7 @@ app.post('/api/checkout', async (req, res) => {
         action: 'AUTH',
         amount: { currencyCode: plan.currency, value: plan.amount },
         merchantAttributes: {
-          redirectUrl: `http://localhost:${PORT}/payment/callback`,
+          redirectUrl: `${req.protocol}://${req.get('host')}/payment/callback`,
           skipConfirmationPage: true,
         },
         emailAddress: 'test@example.com',
