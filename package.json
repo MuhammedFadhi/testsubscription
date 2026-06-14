@@ -1,0 +1,14 @@
+{
+  "name": "subscription-payment-test",
+  "version": "1.0.0",
+  "description": "Test page for subscription plans with N-Genius payment gateway integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

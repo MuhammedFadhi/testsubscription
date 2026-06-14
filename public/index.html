@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscription Plans</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Choose your subscription plan</h1>
+  <p class="subtitle">Test checkout powered by N-Genius Payments (Sandbox)</p>
+
+  <div class="plans">
+    <div class="plan-card">
+      <h2>Basic</h2>
+      <div class="price">SAR 19.99 <span>/ month</span></div>
+      <ul>
+        <li>1 user</li>
+        <li>Email support</li>
+        <li>Basic features</li>
+      </ul>
+      <button class="subscribe-btn" data-plan="basic">Subscribe</button>
+    </div>
+
+    <div class="plan-card featured">
+      <h2>Pro</h2>
+      <div class="price">SAR 49.99 <span>/ month</span></div>
+      <ul>
+        <li>Up to 10 users</li>
+        <li>Priority support</li>
+        <li>Advanced features</li>
+      </ul>
+      <button class="subscribe-btn" data-plan="pro">Subscribe</button>
+    </div>
+
+    <div class="plan-card">
+      <h2>Enterprise</h2>
+      <div class="price">SAR 99.99 <span>/ month</span></div>
+      <ul>
+        <li>Unlimited users</li>
+        <li>Dedicated support</li>
+        <li>All features</li>
+      </ul>
+      <button class="subscribe-btn" data-plan="enterprise">Subscribe</button>
+    </div>
+  </div>
+
+  <div id="error-box">
+    <h3>Payment Error</h3>
+    <div id="error-message"></div>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.subscribe-btn');
+    const errorBox = document.getElementById('error-box');
+    const errorMessage = document.getElementById('error-message');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const planId = btn.dataset.plan;
+
+        errorBox.style.display = 'none';
+        errorMessage.textContent = '';
+        buttons.forEach((b) => (b.disabled = true));
+        btn.textContent = 'Processing...';
+
+        try {
+          const response = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ planId }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw data;
+          }
+
+          // Redirect to the N-Genius hosted payment page
+          window.location.href = data.paymentUrl;
+        } catch (err) {
+          console.error('Checkout error:', err);
+          errorBox.style.display = 'block';
+          errorMessage.textContent =
+            (err.error || 'Unknown error') +
+            (err.details ? '\n\n' + JSON.stringify(err.details, null, 2) : '');
+
+          buttons.forEach((b) => (b.disabled = false));
+          btn.textContent = 'Subscribe';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
